@@ -345,7 +345,7 @@ void gOnMain() {
 #endif
 
 	hvvr::transform worldFromCamera =
-		hvvr::transform(gCameraPos, hvvr::quaternion::fromEulerAngles(gCameraYaw, gCameraPitch, 0), 1.0f);
+		hvvr::transform(gCameraPos, hvvr::quaternion::fromEulerAngles(gCameraYaw, gCameraPitch, 0), hvvr::vector3(1.0f));
 	gCamera->setCameraToWorld(worldFromCamera);
 
 	gRayCaster->render(elapsedTime);

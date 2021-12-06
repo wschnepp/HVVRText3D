@@ -120,8 +120,9 @@ struct SkeletonNode {
 
     transform parentFromNode = transform::identity(); // transform of the node
     size_t parentIndex = 0;                           // Index of parent node
-    char name[96 - sizeof(size_t)];                   // Node name
+    char name[88 - sizeof(size_t)];                   // Node name
 };
+//const int size_skeleton = sizeof(SkeletonNode);
 static_assert(sizeof(SkeletonNode) == 0x80, "I like round numbers.");
 
 struct TopologyNode {

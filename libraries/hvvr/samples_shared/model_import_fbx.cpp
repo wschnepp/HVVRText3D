@@ -150,7 +150,7 @@ hvvr::transform AsTransform(const FbxAMatrix& a) {
     FbxVector4 t = a.GetT();
     FbxVector4 s = a.GetS();
     return hvvr::transform(hvvr::vector3(float(t[0]), float(t[1]), float(t[2])),
-                           hvvr::quaternion(float(q[0]), float(q[1]), float(q[2]), float(q[3])), float(s[0]));
+                           hvvr::quaternion(float(q[0]), float(q[1]), float(q[2]), float(q[3])), hvvr::vector3(float(s[0]), float(s[1]), float(s[2])));
 }
 
 hvvr::transform GetGeometryTransform(FbxNode* pNode) {
@@ -161,7 +161,8 @@ hvvr::transform GetGeometryTransform(FbxNode* pNode) {
     auto lM = FbxAMatrix(lT, lR, lS);
     auto lQ = lM.GetQ();
     return hvvr::transform(hvvr::vector3(float(lT[0]), float(lT[1]), float(lT[2])),
-                           hvvr::quaternion(float(lQ[0]), float(lQ[1]), float(lQ[2]), float(lQ[3])), float(lS[0]));
+                           hvvr::quaternion(float(lQ[0]), float(lQ[1]), float(lQ[2]), float(lQ[3])),
+                           hvvr::vector3(float(lS[0]), float(lS[1]), float(lS[2])));
 }
 
 // Get the value of a geometry element for a triangle vertex

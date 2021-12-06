@@ -1020,23 +1020,24 @@ CHDI quaternion nlerp(const quaternion& a, const quaternion& b, float c) {
 struct transform {
     quaternion rotation;
     vector3 translation;
-    float scale;
+    vector3 scale;
 
     CHD transform() : transform(transform::identity()) {}
-    CHD transform(const vector3& _translation, const quaternion& _rotation, float _scale)
+    CHD transform(const vector3& _translation, const quaternion& _rotation, const vector3& _scale)
         : translation(_translation), rotation(_rotation), scale(_scale) {}
-    CHD explicit transform(const vector3& _translation) : transform(_translation, quaternion::identity(), 1.0f) {}
-    CHD explicit transform(const quaternion& _rotation) : transform(vector3(0.0f), _rotation, 1.0f) {}
-    CHD explicit transform(float _scale) : transform(vector3(0.0f), quaternion::identity(), _scale) {}
+    CHD explicit transform(const vector3& _translation) : transform(_translation, quaternion::identity(), vector3(1.0f)) {}
+    CHD explicit transform(const quaternion& _rotation) : transform(vector3(0.0f), _rotation, vector3(1.0f)) {}
+    CHD explicit transform(float _scale) : transform(vector3(0.0f), quaternion::identity(), vector3(_scale)) {}
 
     CHD static transform identity() {
-        return transform(vector3(0.0f), quaternion::identity(), 1.0f);
+        return transform(vector3(0.0f), quaternion::identity(), vector3(1.0f));
     }
 
     // note - this treats v as a direction, and does not apply translation
     CHD vector3 operator*(const vector3& v) const {
         return rotation * (v * scale);
     }
+
     CHD vector4 operator*(const vector4& v) const {
         return vector4(translation * v.w + rotation * (vector3(v) * scale), v.w);
     }
@@ -1047,7 +1048,7 @@ struct transform {
 };
 
 CHDI transform invert(const transform& t) {
-    float scale = 1.0f / t.scale;
+    vector3 scale = vector3(1.0f / t.scale.x, 1.0f / t.scale.y, 1.0f / t.scale.z);
     quaternion rotation = ~t.rotation;
     vector3 translation = rotation * t.translation * -scale;
     return transform(translation, rotation, scale);
@@ -1110,6 +1111,9 @@ struct matrix3x3 {
     }
     CHD static matrix3x3 scale(float s) {
         return matrix3x3(vector3(s, 0.0f, 0.0f), vector3(0.0f, s, 0.0f), vector3(0.0f, 0.0f, s));
+    }
+    CHD static matrix3x3 scale(const hvvr::vector3& s) {
+        return matrix3x3(vector3(s[0], 0.0f, 0.0f), vector3(0.0f, s[1], 0.0f), vector3(0.0f, 0.0f, s[2]));
     }
     CHD static matrix3x3 diagonal(float s) {
         return scale(s);
@@ -1226,7 +1230,7 @@ struct matrix4x4 {
         : m0(m.m0, 0.0f), m1(m.m1, 0.0f), m2(m.m2, 0.0f), m3(translation, 1.0f) {}
     CHD explicit matrix4x4(const matrix3x3& m)
         : m0(m.m0, 0.0f), m1(m.m1, 0.0f), m2(m.m2, 0.0f), m3(0.0f, 0.0f, 0.0f, 1.0f) {}
-    CHD explicit matrix4x4(const transform& t) : matrix4x4(matrix3x3(t.rotation) * t.scale, t.translation) {}
+    CHD explicit matrix4x4(const transform& t) : matrix4x4(matrix3x3::scale(t.scale) * matrix3x3(t.rotation), t.translation) {}
 
     CHD explicit operator matrix3x3() const {
         return matrix3x3(vector3(m0), vector3(m1), vector3(m2));
@@ -1246,6 +1250,10 @@ struct matrix4x4 {
     }
     CHD static matrix4x4 scale(float s) {
         return matrix4x4(vector4(s, 0.0f, 0.0f, 0.0f), vector4(0.0f, s, 0.0f, 0.0f), vector4(0.0f, 0.0f, s, 0.0f),
+                         vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    }
+    CHD static matrix4x4 scale(const hvvr::vector3& s) {
+        return matrix4x4(vector4(s[0], 0.0f, 0.0f, 0.0f), vector4(0.0f, s[1], 0.0f, 0.0f), vector4(0.0f, 0.0f, s[2], 0.0f),
                          vector4(0.0f, 0.0f, 0.0f, 1.0f));
     }
     CHD static matrix4x4 diagonal(float s) {
