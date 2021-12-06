@@ -49,7 +49,7 @@ Grid::TextGrid* InitializeText(std::string path, std::string filename)
 	thorax_ai::FontRenderInfo *ft_render_info = new thorax_ai::FontRenderInfo();
 	ft_render_info->Initialize(font);
 
-	std::string words = "To be, or not to be, that is the question :";
+	std::string words = "To be\n";
 
 	unsigned points[4096];
 	int hres = 0;
