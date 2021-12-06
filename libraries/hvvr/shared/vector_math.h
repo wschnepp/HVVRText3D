@@ -489,7 +489,7 @@ struct half {
 private:
     CHD static uint16_t floatToHalf(float x) {
 #if CUDA_COMPILE
-        return __float2half(x).x;
+        return __float2half(x);
 #else
 #ifdef _MSC_VER
         return _mm_cvtps_ph(_mm_set_ps1(x), 0).m128i_u16[0];

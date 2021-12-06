@@ -32,8 +32,10 @@
 #include <unordered_map>
 #include <vector>
 
-//#include <fbxsdk.h>
+#include <fbxsdk.h>
 #ifdef _DEBUG
+#pragma comment(lib, "debug/zlib-md.lib")
+#pragma comment(lib, "debug/libxml2-md.lib")
 # pragma comment(lib, "debug/libfbxsdk-md.lib")
 #else
 # pragma comment(lib, "release/libfbxsdk-md.lib")

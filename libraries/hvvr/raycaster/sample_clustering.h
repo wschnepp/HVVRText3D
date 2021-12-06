@@ -12,7 +12,7 @@
 #include "magic_constants.h"
 #include "samples.h"
 #include "dynamic_array.h"
-
+#include <algorithm>
 namespace hvvr {
 
 template <class PointClass>

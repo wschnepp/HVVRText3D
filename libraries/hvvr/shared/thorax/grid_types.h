@@ -130,8 +130,8 @@ namespace Grid
 	struct GlyphPtr {
 		int instance;
 		int ptr;
-		int offset;
-		int count;
+		const int offset = 0x00;
+		const int count = 0x00;
 		Matrix2x3 transform_to_local;
 	};
 

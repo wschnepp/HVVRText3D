@@ -24,7 +24,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-
+#include <cstring>
 #define DEBUG_NOINLINE
 //#define DEBUG_NOINLINE __declspec(noinline)
 

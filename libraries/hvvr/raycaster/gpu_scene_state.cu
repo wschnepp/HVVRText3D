@@ -7,6 +7,8 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+#include <algorithm>
+
 #include "bvh_node.h"
 #include "cuda_util.h"
 #include "gpu_scene_state.h"
@@ -568,27 +570,30 @@ void GPUSceneState::setGeometry(const Raycaster& raycaster) {
             return false;
         return a.childIndex < b.childIndex;
     };
-    std::sort(refitTasksNodeCPU.begin(), refitTasksNodeCPU.end(), nodeRefitSort);
 
-    // place internal node refit tasks into groups that can run concurrently (all nodes of the same depth)
-    // the root node doesn't have an entry in the task list - children populate the parent node
-    refitNodeGroupBoundaries = DynamicArray<uint32_t>(maxInternalDepth);
-    uint32_t currentDepth = nodeDepths[refitTasksNodeCPU[0].nodeChild >> 2];
-    assert(currentDepth < maxInternalDepth);
-    uint32_t currentGroup = 0;
-    refitNodeGroupBoundaries[0] = 0;
-    for (size_t n = 0; n < refitTasksNodeCPU.size(); n++) {
-        uint32_t depth = nodeDepths[refitTasksNodeCPU[n].nodeChild >> 2];
-        if (depth != currentDepth) {
-            currentDepth = depth;
-            currentGroup++;
-            assert(currentDepth < maxInternalDepth);
-            assert(currentGroup < maxInternalDepth);
-        }
+	if (refitTasksNodeCPU.size() > 0) {
+    
+		std::sort(refitTasksNodeCPU.begin(), refitTasksNodeCPU.end(), nodeRefitSort);
 
-        refitNodeGroupBoundaries[currentGroup] = uint32_t(n);
-    }
+		// place internal node refit tasks into groups that can run concurrently (all nodes of the same depth)
+		// the root node doesn't have an entry in the task list - children populate the parent node
+		refitNodeGroupBoundaries = DynamicArray<uint32_t>(maxInternalDepth);
+		uint32_t currentDepth = nodeDepths[refitTasksNodeCPU[0].nodeChild >> 2];
+		assert(currentDepth < maxInternalDepth);
+		uint32_t currentGroup = 0;
+		refitNodeGroupBoundaries[0] = 0;
+		for (size_t n = 0; n < refitTasksNodeCPU.size(); n++) {
+			uint32_t depth = nodeDepths[refitTasksNodeCPU[n].nodeChild >> 2];
+			if (depth != currentDepth) {
+				currentDepth = depth;
+				currentGroup++;
+				assert(currentDepth < maxInternalDepth);
+				assert(currentGroup < maxInternalDepth);
+			}
 
+			refitNodeGroupBoundaries[currentGroup] = uint32_t(n);
+		}
+	}
     // copy to GPU
     nodes = makeGPUBuffer(raycaster._nodes);
     triToNodeChild = makeGPUBuffer(triToNodeChildCPU);
