@@ -28,11 +28,12 @@
 
 #include <ShellScalingAPI.h>
 #include <stdio.h>
+#include <fstream>
 
 #pragma comment(lib, "Shcore.lib")
 
 // disable camera movement for benchmarking?
-#define DISABLE_MOVEMENT 0
+#define DISABLE_MOVEMENT 1
 #define CAMERA_SPEED 3.0
 
 // 0 = off, 1 = match monitor refresh, 2 = half monitor refresh
@@ -145,6 +146,48 @@ shutdown:
 	return (int)msg.wParam;
 }
 
+inline void writeString(std::ofstream& stream, std::string string) {
+    stream.write(string.c_str(), string.size());
+}
+
+void exportTextGrid(Grid::TextGrid* grid) {
+    std::ofstream outStream = std::ofstream("export_textgrid.bin", std::ios::binary);
+
+    writeString(outStream, "res:");
+    outStream.write((char*)&grid->hres, 2 * sizeof(int));
+
+	
+    writeString(outStream, "lowest:");
+    outStream.write((char*)&grid->lowest_x, 2 * sizeof(int));
+
+    writeString(outStream, "highest:");
+    outStream.write((char*)&grid->highest_x, 2 * sizeof(int));
+
+	
+    writeString(outStream, "cells:");
+    outStream.write((char*)grid->cells, grid->cell_count * sizeof(Grid::TextGridCell));
+    writeString(outStream, "glyph_ptrs:");
+    outStream.write((char*)grid->glyph_ptrs, grid->glyph_ptr_count * sizeof(Grid::GlyphPtr));
+
+    writeString(outStream, "glyp_grids:");
+    outStream.write((char*)grid->glyph_grids, grid->glyph_grid_count * sizeof(Grid::GlyphGrid));
+    writeString(outStream, "glyph_grid_cells:");
+    outStream.write((char*)grid->glyph_grid_cells, grid->glyph_grid_cell_count * sizeof(Grid::GlyphGridCell));
+    
+	writeString(outStream, "shapes:");
+    outStream.write((char*)grid->shapes, grid->shape_count * sizeof(Grid::Shape));
+    
+	
+	writeString(outStream, "shape_ptrs:");
+    outStream.write((char*)grid->shape_ptrs, grid->shape_ptr_count * sizeof(Grid::shape_ptr));
+
+    writeString(outStream, "counts:");
+    outStream.write((char*)grid->shapes, 6 * sizeof(int));
+	outStream.write(reinterpret_cast<const char*>(grid), sizeof(Grid::TextGrid));
+    outStream.close();
+	
+}
+
 void gOnInit() {
 	RayCasterSpecification spec;
 #if ENABLE_FOVEATED
@@ -190,10 +233,10 @@ void gOnInit() {
 
 	case scene_sponza:
 		// Amazon Bistro
-		gCameraPos = hvvr::vector3(-.85, 6,5.2);
+		gCameraPos = hvvr::vector3(0, 0, 2);
 		gCameraYaw = 0*(3.1415 / 180.f);
-		gCameraPitch = -64* (3.1415 / 180.f);
-		scenePath = sceneBasePath + "papernorms.bin";
+		gCameraPitch = 0* (3.1415 / 180.f);
+		scenePath = sceneBasePath + "plane2_new.fbx";
 		break;
 
 	default:
@@ -223,7 +266,7 @@ void gOnInit() {
 	model_import::Model importedModel;
 	if (!model_import::load(scenePath.c_str(), importedModel)) {
 		hvvr::fail("failed to load model %s", scenePath.c_str());
-	}
+    }
 
 	// apply scaling
 	for (auto& mesh : importedModel.meshes) {
@@ -236,6 +279,7 @@ void gOnInit() {
 
 	//import text
 	Grid::TextGrid* tgrid = InitializeText(sceneBasePath, textFont);
+    //exportTextGrid(tgrid);
 	hvvr::UploadGrid(tgrid);
 }
 
