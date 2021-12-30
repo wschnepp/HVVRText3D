@@ -1,0 +1,6 @@
+Copyright 2021 Wilhelm Schnepp
+
+The models provided in this folder were created by me, Wilhelm Schnepp,
+and are licensed under the "Creative Commons - By Attribution License", Version 4.0.
+A copy of this license can be obtained from
+https://creativecommons.org/licenses/by/4.0/legalcode
