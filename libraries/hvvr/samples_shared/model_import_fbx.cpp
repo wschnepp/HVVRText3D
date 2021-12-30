@@ -34,9 +34,9 @@
 
 #include <fbxsdk.h>
 #ifdef _DEBUG
-#pragma comment(lib, "debug/zlib-md.lib")
-#pragma comment(lib, "debug/libxml2-md.lib")
-# pragma comment(lib, "debug/libfbxsdk-md.lib")
+#pragma comment(lib, "zlib-md.lib")
+#pragma comment(lib, "libxml2-md.lib")
+#pragma comment(lib, "libfbxsdk-md.lib ")
 #else
 # pragma comment(lib, "release/libfbxsdk-md.lib")
 #endif
@@ -232,7 +232,7 @@ bool importMesh(ImportState& state, FbxNode* pNode) {
     const FbxGeometryElementUV* pUVs = pMesh->GetElementUV(0);
 
     const FbxLayerElementMaterial* pPolygonMaterials = pMesh->GetElementMaterial();
-    assert(pPolygonMaterials != nullptr);
+    assert(pPolygonMaterials != nullptr, "Mesh '" + pMesh->GetName() + "does not have a material");
     assert(pPolygonMaterials->GetReferenceMode() == FbxGeometryElement::eIndex ||
            pPolygonMaterials->GetReferenceMode() == FbxGeometryElement::eIndexToDirect);
     FbxGeometryElement::EMappingMode mappingMode = pPolygonMaterials->GetMappingMode();
