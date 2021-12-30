@@ -30,35 +30,62 @@ Grid::TextGrid* GetTextGridCPU(thorax_ai::Array<thorax_ai::Shape> &shapes, thora
 	return textGrid;
 }
 
+//CALLER HAS TO HANDLE DATA DEALLOC USING DELETE[]
+const char* readFile(const char* filePath, int* size)
+{
+	FILE* f = nullptr;
+	int result = fopen_s(&f, filePath, "rb");
+	if (result != 0) {
+		std::cerr << "Failed to open file: " << filePath << ": " << result << "\n";
+	}
+
+	fseek(f, 0, SEEK_END);
+	*size = ftell(f);
+	rewind(f);
+	const char* data = new char[*size];
+	fread_s((void*)data, *size, sizeof(char), *size, f);
+	fclose(f);
+	return data;
+}
+
 Grid::TextGrid* InitializeText(std::string path, std::string filename)
 {
 	std::string textfilename = "Times\ New\ Roman.ttf";
 	const Font *font;
 	{
-		FILE *f = new FILE();
-		fopen_s(&f, (path + textfilename).c_str(), "rb");
-
-		fseek(f, 0, SEEK_END);
-		int size = ftell(f);
-		rewind(f);
-		const char* data = new char[size];
-		fread_s((void*)data, size, sizeof(char), size, f);
+		int dataSize = 0;
+		const char* data = readFile((path + textfilename).c_str(), &dataSize);
 		font = Font::AsFont(data);
-		fclose(f);
 	}
 	thorax_ai::FontRenderInfo *ft_render_info = new thorax_ai::FontRenderInfo();
 	ft_render_info->Initialize(font);
 
-	std::string words = "To be\n";
+	int textLength = 0;
+	const char* textData = nullptr;
+	{ textData = readFile((path + filename).c_str(), &textLength);
+	}
+
+	//if (!textData) {
+	//	return nullptr;
+	//}
 
 	unsigned points[4096];
 	int hres = 0;
 	int vresmax = 0;
 	int hresmax = 0;
 	int counts = 0;
-	for (int i = 0; i < words.length(); i++)
+	for (int i = 0; i < textLength; i++)
 	{
-		if (words[i] == '\n') {
+		if (textData[i] < 0) {
+			std::cerr << "Invalid character '" << textData[i] << "' at position " << i
+			          << ". Are you sure the input is encoded in ASCII?\n";
+			continue;
+		}
+		if (textData[i] == '\r') {
+			continue;
+		}
+
+		if (textData[i] == '\n') {
 			vresmax++;
 			hres = 0;
 		}
@@ -66,7 +93,7 @@ Grid::TextGrid* InitializeText(std::string path, std::string filename)
 			hres++;
 			hresmax = hresmax < hres ? hres : hresmax;
 		}
-		points[i] = words[i];
+		points[counts] = textData[i];
 		counts++;
 	}
 
@@ -77,5 +104,7 @@ Grid::TextGrid* InitializeText(std::string path, std::string filename)
 	Grid::TextGrid *tgrid = GetTextGridCPU(ft_render_info->shapes, ft_render_info->glyph_grids,
 		ft_render_info->glyph_grid_cells, ft_render_info->shape_ptrs);
 	GridBuild(tgrid, glyphRefs, numRefs, hresmax, vresmax);
+
+	//delete[] textData;
 	return tgrid;
 }
