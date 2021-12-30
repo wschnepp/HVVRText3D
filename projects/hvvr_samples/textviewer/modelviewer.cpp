@@ -57,8 +57,8 @@ enum ModelviewerScene {
 // which scene to loadscene_cornell
 static ModelviewerScene gSceneSelect = scene_sponza;
 
-#define RT_WIDTH 1920
-#define RT_HEIGHT 1080
+#define RT_WIDTH 1280
+#define RT_HEIGHT 720
 
 static hvvr::Timer gTimer;
 
@@ -198,7 +198,7 @@ void gOnInit() {
 #endif
 	gRayCaster = std::make_unique<hvvr::Raycaster>(spec);
 
-	std::string sceneBasePath = "../../../../libraries/hvvr/samples_shared/data/scenes/";
+	std::string sceneBasePath = "../../../../testmodels/";
 	std::string scenePath;
 	std::string textFont;
 	std::string textFile;
@@ -226,17 +226,18 @@ void gOnInit() {
 		// Stanford Bunny
 		gCameraPos = hvvr::vector3(0,1.35, .075);
 		gCameraYaw = 0;
-		gCameraPitch = -90 * (3.1415 / 180.f);
+		gCameraPitch = 0 * (3.1415 / 180.f);
 		scenePath = sceneBasePath + "planes.bin";
 		textFont = "book_text.txt";
 		break;
 
 	case scene_sponza:
 		// Amazon Bistro
-		gCameraPos = hvvr::vector3(0, 0, 2);
-		gCameraYaw = 0*(3.1415 / 180.f);
-		gCameraPitch = 0* (3.1415 / 180.f);
-		scenePath = sceneBasePath + "plane2_new.fbx";
+		gCameraPos = hvvr::vector3(0, 1.5, -3.5);
+        gCameraYaw = 180 * (3.1415 / 180.f);
+        gCameraPitch = 0 * (3.1415 / 180.f);
+        scenePath = sceneBasePath + "book.fbx";
+        textFont = "book_text.txt";
 		break;
 
 	default:
@@ -269,9 +270,9 @@ void gOnInit() {
     }
 
 	// apply scaling
-	for (auto& mesh : importedModel.meshes) {
-		mesh.transform.scale *= sceneScale;
-	}
+	//for (auto& mesh : importedModel.meshes) {
+	//	mesh.transform.scale *= sceneScale;
+	//}
 	// create the scene objects in the raycaster
 	if (!model_import::createObjects(*gRayCaster, importedModel)) {
 		hvvr::fail("failed to create model objects");
