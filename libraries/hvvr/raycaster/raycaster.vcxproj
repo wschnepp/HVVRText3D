@@ -107,12 +107,12 @@
     <ProjectGuid>{c5d565c3-8f10-41a4-980c-b233064bbd24}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>raycaster</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>false</UseDebugLibraries>
   </PropertyGroup>
@@ -129,7 +129,7 @@
   <ItemDefinitionGroup>
     <CudaCompile>
       <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
-      <CodeGeneration>compute_52,sm_52</CodeGeneration>
+      <CodeGeneration>compute_50,sm_50</CodeGeneration>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <FastMath>true</FastMath>
       <GenerateLineInfo>true</GenerateLineInfo>
